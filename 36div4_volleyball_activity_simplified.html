@@ -1,0 +1,961 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>36÷4의 해결 방법을 탐구해봅시다</title>
+<style>
+  :root {
+    --navy: #17243f;
+    --ink: #22304f;
+    --muted: #66738a;
+    --court: #f1b45a;
+    --court-dark: #dd9450;
+    --court-line: rgba(255,255,255,.92);
+    --green: #10a06e;
+    --teal: #14b8c7;
+    --teal-dark: #087985;
+    --orange: #ef7b32;
+    --yellow: #ffd64d;
+    --red: #e84a3a;
+    --card: rgba(255,255,255,.92);
+    --line: rgba(23,36,63,.15);
+    --shadow: 0 18px 36px rgba(23,36,63,.18);
+    --tap: 48px;
+    --ball-size: clamp(38px, 4.35vw, 76px);
+  }
+
+  * { box-sizing: border-box; }
+
+  html,
+  body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overscroll-behavior: none;
+  }
+
+  body {
+    font-family: "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--ink);
+    overflow: hidden;
+    background: #cfd5df;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  button {
+    font: inherit;
+    border: 0;
+    cursor: pointer;
+    user-select: none;
+    touch-action: manipulation;
+  }
+
+  button:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 6px rgba(18,185,199,.23);
+  }
+
+  .activity {
+    width: min(1920px, 100%);
+    height: 100dvh;
+    margin: 0 auto;
+    display: grid;
+    grid-template-rows: clamp(92px, 13vh, 148px) minmax(0, 1fr) clamp(82px, 12.5vh, 126px);
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 10% 18%, rgba(255,255,255,.42) 0 13%, transparent 14%),
+      radial-gradient(circle at 92% 82%, rgba(255,255,255,.30) 0 15%, transparent 16%),
+      linear-gradient(180deg, #e7ebf1 0%, #d2d8e1 56%, #c4ccd7 100%);
+    isolation: isolate;
+  }
+
+  .activity:fullscreen,
+  .activity:-webkit-full-screen {
+    width: 100vw;
+    height: 100vh;
+    max-width: none;
+    background: #d2d8e1;
+  }
+
+  .top-control {
+    position: absolute;
+    z-index: 200;
+    left: clamp(12px, 1.2vw, 22px);
+    right: clamp(12px, 1.2vw, 22px);
+    top: clamp(8px, .9vw, 18px);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: clamp(8px, 1vw, 16px);
+    pointer-events: none;
+  }
+
+  .top-left,
+  .top-actions {
+    display: flex;
+    align-items: center;
+    gap: clamp(7px, .8vw, 12px);
+    flex-wrap: wrap;
+    pointer-events: auto;
+  }
+
+  .top-left { min-width: 0; flex: 1 1 auto; }
+  .top-actions { justify-content: flex-end; flex: 0 0 auto; }
+
+  .activity-title,
+  .count-pill,
+  .mini-btn,
+  .fullscreen-toggle {
+    min-height: var(--tap);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    padding: 8px clamp(12px, 1.05vw, 18px);
+    font-weight: 1000;
+    letter-spacing: -.045em;
+    box-shadow: inset 0 -4px 0 rgba(23,36,63,.08), 0 8px 16px rgba(23,36,63,.12);
+  }
+
+  .activity-title {
+    max-width: min(980px, 66vw);
+    color: var(--navy);
+    background: rgba(255,255,255,.97);
+    border: 3px solid rgba(239,123,50,.28);
+    font-size: clamp(18px, 1.65vw, 31px);
+    line-height: 1.13;
+    text-align: center;
+    word-break: keep-all;
+  }
+
+  .count-pill {
+    color: #fff;
+    background: #0f7f87;
+    font-size: clamp(15px, 1.05vw, 20px);
+    white-space: nowrap;
+  }
+
+  .mini-btn,
+  .fullscreen-toggle {
+    color: #17243f;
+    background: rgba(255,255,255,.96);
+    border: 2px solid rgba(23,36,63,.13);
+    font-size: clamp(13px, .94vw, 18px);
+    transition: transform .12s ease, filter .12s ease;
+    white-space: nowrap;
+  }
+
+  .fullscreen-toggle {
+    color: var(--teal-dark);
+    background: #eaffff;
+    border-color: rgba(18,185,199,.30);
+  }
+
+  .mini-btn:active,
+  .fullscreen-toggle:active { transform: translateY(2px); }
+
+  .gym-top {
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    padding: clamp(10px, 1vw, 18px) clamp(28px, 5vw, 80px) 0;
+    display: grid;
+    place-items: end stretch;
+    filter: drop-shadow(0 10px 12px rgba(0,0,0,.16));
+  }
+
+  .gym-banner {
+    height: 100%;
+    min-height: 78px;
+    border-radius: 0 0 26px 26px;
+    border: 4px solid rgba(23,36,63,.18);
+    border-top: 0;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.40), rgba(255,255,255,0) 32%, rgba(0,0,0,.06)),
+      repeating-linear-gradient(90deg,
+        #f05b46 0 8.333%,
+        #ffd64d 8.333% 16.666%);
+    box-shadow: inset 0 -14px 0 rgba(0,0,0,.08);
+    position: relative;
+  }
+
+  .gym-banner::before,
+  .gym-banner::after {
+    content: "";
+    position: absolute;
+    bottom: clamp(12px, 2vh, 24px);
+    width: clamp(150px, 18vw, 360px);
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.75);
+    box-shadow: 0 14px 0 rgba(255,255,255,.35);
+  }
+
+  .gym-banner::before { left: clamp(28px, 5vw, 90px); }
+  .gym-banner::after { right: clamp(28px, 5vw, 90px); }
+
+  .middle-area {
+    position: relative;
+    z-index: 0;
+    min-height: 0;
+    padding: clamp(10px, 1.2vw, 22px);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(10px, 1.1vw, 18px);
+  }
+
+  .middle-area::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: .16;
+    background-image:
+      linear-gradient(rgba(255,255,255,.55) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.55) 1px, transparent 1px);
+    background-size: 28px 28px;
+    pointer-events: none;
+  }
+
+  .play-card {
+    background: var(--card);
+    border: 3px solid var(--line);
+    border-radius: clamp(20px, 1.5vw, 30px);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(8px);
+  }
+
+  .play-card {
+    position: relative;
+    z-index: 2;
+    min-height: 0;
+    padding: clamp(10px, .95vw, 18px);
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: clamp(8px, .8vw, 13px);
+    overflow: hidden;
+  }
+
+  .play-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .feedback {
+    min-height: clamp(48px, 5.4vh, 68px);
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 10px;
+    padding: clamp(9px, .8vw, 13px) clamp(11px, 1vw, 16px);
+    border-radius: clamp(16px, 1.1vw, 22px);
+    background: #f2f6ff;
+    border: 2px solid rgba(75,126,230,.20);
+    color: #39465f;
+    font-size: clamp(14px, .98vw, 18px);
+    line-height: 1.34;
+    font-weight: 900;
+    word-break: keep-all;
+  }
+
+  .feedback.warn { background: #fff4e7; border-color: rgba(239,106,46,.35); color: #8b3d00; }
+  .feedback.good { background: #effdf5; border-color: rgba(36,170,104,.34); color: #076d3f; }
+  .feedback.plain { grid-template-columns: 1fr; }
+  .feedback.message-only { grid-template-columns: 1fr; text-align: center; }
+
+  .progress-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: clamp(42px, 3vw, 54px);
+    padding: 7px 15px;
+    border-radius: 999px;
+    background: #e9ffef;
+    border: 2px solid rgba(36,170,104,.26);
+    color: #076d3f;
+    font-size: clamp(15px, 1.05vw, 20px);
+    font-weight: 1000;
+    white-space: nowrap;
+    box-shadow: inset 0 -4px 0 rgba(23,36,63,.06);
+  }
+
+  .court-board {
+    position: relative;
+    min-height: 0;
+    border-radius: clamp(18px, 1.25vw, 27px);
+    border: 5px solid rgba(23,36,63,.18);
+    background:
+      linear-gradient(90deg, transparent 49.4%, var(--court-line) 49.4% 50.6%, transparent 50.6%),
+      linear-gradient(0deg, transparent 17%, var(--court-line) 17% 18.2%, transparent 18.2% 81.8%, var(--court-line) 81.8% 83%, transparent 83%),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 22px, rgba(0,0,0,.025) 22px 44px),
+      linear-gradient(180deg, #f5c06b 0%, var(--court) 50%, var(--court-dark) 100%);
+    overflow: hidden;
+    touch-action: none;
+    cursor: crosshair;
+    box-shadow: inset 0 -18px 26px rgba(23,36,63,.08), 0 10px 16px rgba(0,0,0,.08);
+  }
+
+  .court-board::before {
+    content: "";
+    position: absolute;
+    inset: 6.5% 4.5%;
+    border: 5px solid var(--court-line);
+    border-radius: 14px;
+    opacity: .88;
+    pointer-events: none;
+  }
+
+  .court-board::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 7%;
+    bottom: 7%;
+    width: 10px;
+    transform: translateX(-50%);
+    background:
+      repeating-linear-gradient(180deg, rgba(23,36,63,.45) 0 10px, transparent 10px 20px);
+    border-radius: 999px;
+    opacity: .55;
+    pointer-events: none;
+  }
+
+  .court-board.complete {
+    box-shadow: 0 0 0 8px rgba(36,170,104,.14), inset 0 -18px 26px rgba(23,36,63,.08), 0 10px 16px rgba(0,0,0,.08);
+    border-color: rgba(36,170,104,.58);
+  }
+
+  #groupsSvg,
+  #drawCanvas,
+  .items-layer,
+  .labels-layer,
+  .hint-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  #groupsSvg { z-index: 20; pointer-events: none; }
+  .hint-layer { z-index: 24; pointer-events: none; }
+  .items-layer { z-index: 30; pointer-events: none; }
+  .labels-layer { z-index: 40; pointer-events: none; }
+  #drawCanvas { z-index: 60; pointer-events: none; }
+
+  .court-mark {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    padding: 10px 18px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.74);
+    color: rgba(23,36,63,.55);
+    border: 2px dashed rgba(23,36,63,.24);
+    font-weight: 1000;
+    letter-spacing: -.04em;
+    font-size: clamp(14px, 1.1vw, 20px);
+    white-space: nowrap;
+  }
+
+  .ball-item {
+    position: absolute;
+    left: calc(var(--x) * 1%);
+    top: calc(var(--y) * 1%);
+    width: var(--ball-size);
+    height: var(--ball-size);
+    transform: translate(-50%, -50%) rotate(var(--rot));
+    transform-origin: center;
+    transition: filter .15s ease, opacity .15s ease, transform .15s ease;
+    filter: drop-shadow(0 7px 3px rgba(70,45,24,.22));
+  }
+
+  .ball-item.grouped {
+    filter: drop-shadow(0 5px 2px rgba(70,45,24,.16)) saturate(.92);
+    opacity: .92;
+    transform: translate(-50%, -50%) rotate(var(--rot)) scale(.95);
+  }
+
+  .ball-item svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    overflow: visible;
+  }
+
+  .ball-main { fill: #fff8e7; stroke: #17243f; stroke-width: 4.6; }
+  .ball-outline { fill: none; stroke: #17243f; stroke-width: 4.6; }
+  .ball-seam { fill: none; stroke: rgba(23,36,63,.66); stroke-width: 3.2; stroke-linecap: round; }
+  .ball-panel-a { fill: #ffcf4b; opacity: .96; }
+  .ball-panel-b { fill: #45b8ff; opacity: .95; }
+  .ball-panel-c { fill: #ff7d56; opacity: .92; }
+  .ball-highlight { fill: rgba(255,255,255,.68); }
+
+  .group-label {
+    position: absolute;
+    left: calc(var(--x) * 1%);
+    top: calc(var(--y) * 1%);
+    transform: translate(-50%, -50%);
+    min-width: clamp(64px, 5.7vw, 98px);
+    padding: 7px 12px;
+    border-radius: 999px;
+    color: var(--navy);
+    background: rgba(255,255,255,.97);
+    border: 3px solid var(--color);
+    font-size: clamp(14px, 1vw, 20px);
+    line-height: 1;
+    font-weight: 1000;
+    text-align: center;
+    white-space: nowrap;
+    box-shadow: 0 7px 14px rgba(23,36,63,.16), inset 0 -4px 0 rgba(23,36,63,.06);
+  }
+
+  .gym-bottom {
+    position: relative;
+    z-index: 1;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.70), rgba(241,244,248,.92)),
+      #eef1f5;
+    border-top: 5px solid rgba(23,36,63,.12);
+    display: grid;
+    place-items: center;
+    padding: 0 clamp(18px, 4vw, 70px);
+    box-shadow: inset 0 9px 20px rgba(23,36,63,.08);
+  }
+
+  .bottom-board {
+    height: calc(100% - 12px);
+    width: min(880px, 74vw);
+    max-width: 88%;
+    min-height: 62px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: clamp(8px, 1.2vw, 22px);
+    padding: 8px clamp(16px, 2.3vw, 40px);
+    border-radius: 18px 18px 0 0;
+    border: 8px solid #fff;
+    border-bottom: 0;
+    background:
+      radial-gradient(circle at 20% 40%, rgba(255,255,255,.20) 0 20%, transparent 21%),
+      linear-gradient(135deg, #0f7f87, #14b8c7 48%, #0b7282);
+    box-shadow: 0 -4px 14px rgba(23,36,63,.15);
+    overflow: hidden;
+  }
+
+  .bottom-text {
+    color: #fff;
+    text-shadow: 0 4px 8px rgba(0,0,0,.20);
+    font-size: clamp(20px, 2.3vw, 40px);
+    line-height: 1;
+    font-weight: 1000;
+    letter-spacing: -.07em;
+    white-space: nowrap;
+    text-align: center;
+  }
+
+  .bottom-icon {
+    width: clamp(48px, 6vw, 84px);
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #fff;
+    border: 5px solid rgba(255,255,255,.82);
+    box-shadow: 0 6px 12px rgba(0,0,0,.14);
+  }
+
+  .bottom-icon svg { width: 82%; height: 82%; }
+
+  @media (max-width: 1240px) and (orientation: landscape) {
+    :root { --ball-size: clamp(34px, 4vw, 62px); --tap: 44px; }
+    .activity { grid-template-rows: 94px minmax(0, 1fr) 88px; }
+    .middle-area { grid-template-columns: minmax(0, 1fr); padding: 10px; }
+    .play-card { padding: 10px; gap: 8px; }
+    .activity-title { max-width: min(760px, 62vw); font-size: 18px; }
+    .feedback { font-size: 14px; padding: 9px 10px; }
+    .top-actions { gap: 7px; }
+    .mini-btn { font-size: 13px; padding-left: 10px; padding-right: 10px; }
+  }
+
+  @media (max-width: 940px), (orientation: portrait) {
+    body { overflow: auto; }
+    .activity { height: auto; min-height: 100svh; grid-template-rows: 108px auto 106px; }
+    .top-control { position: sticky; top: 8px; padding: 0 10px; left: 0; right: 0; }
+    .top-actions { justify-content: flex-start; }
+    .activity-title { max-width: min(820px, 86vw); }
+    .middle-area { min-height: 760px; grid-template-columns: 1fr; }
+    .play-card { min-height: 640px; }
+    .court-board { min-height: 560px; }
+    .play-head { grid-template-columns: 1fr; }
+    .play-status { justify-self: end; }
+    .bottom-board { width: min(720px, 94vw); max-width: 94vw; }
+    .bottom-text { font-size: clamp(18px, 4.8vw, 34px); }
+  }
+</style>
+</head>
+<body>
+<main id="activity" class="activity">
+  <div class="top-control">
+    <div class="top-left">
+      <div class="activity-title">36÷4의 해결 방법을 탐구해봅시다.</div>
+      <div class="count-pill">배구공 36개</div>
+    </div>
+    <div class="top-actions" aria-label="활동 도구">
+      <button id="undoBtn" class="mini-btn" type="button">↩ 마지막 취소</button>
+      <button id="resetBtn" class="mini-btn" type="button">처음으로</button>
+      <button id="fullscreenBtn" class="fullscreen-toggle" type="button">전체화면</button>
+    </div>
+  </div>
+
+  <section class="gym-top" aria-hidden="true">
+    <div class="gym-banner"></div>
+  </section>
+
+  <section class="middle-area">
+    <section class="play-card" aria-label="배구공 묶기 활동판">
+      <div class="play-head">
+        <div id="feedback" class="feedback">
+          <span aria-hidden="true">👆</span>
+          <span>배구공 36개를 <strong>4개씩</strong> 둘러 선을 그어 보세요. 한 묶음에는 꼭 4개가 들어가야 해요.</span>
+        </div>
+        <div class="play-status">
+          <div id="groupBadge" class="progress-badge">0묶음</div>
+        </div>
+      </div>
+
+      <div id="courtBoard" class="court-board" aria-label="선으로 배구공을 묶는 곳">
+        <svg id="groupsSvg" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true"></svg>
+        <div class="hint-layer" aria-hidden="true"><div class="court-mark">4개씩 묶기</div></div>
+        <div id="itemsLayer" class="items-layer" aria-hidden="true"></div>
+        <div id="labelsLayer" class="labels-layer" aria-hidden="true"></div>
+        <canvas id="drawCanvas"></canvas>
+      </div>
+    </section>
+
+
+  </section>
+
+  <footer class="gym-bottom" aria-hidden="true">
+    <div class="bottom-board">
+      <div class="bottom-icon">
+        <svg viewBox="0 0 120 120" role="img" aria-label="배구공 그림">
+          <circle cx="60" cy="60" r="48" fill="#fff8e7" stroke="#17243f" stroke-width="6" />
+          <path d="M22 56 C39 42 61 40 82 52 C72 63 67 76 68 98" fill="none" stroke="#17243f" stroke-width="5" stroke-linecap="round" />
+          <path d="M44 15 C45 34 53 47 68 58 C83 69 92 82 95 103" fill="none" stroke="#17243f" stroke-width="5" stroke-linecap="round" />
+          <path d="M35 93 C48 78 65 71 89 72" fill="none" stroke="#17243f" stroke-width="5" stroke-linecap="round" />
+          <path d="M28 35 C42 23 60 16 80 20" fill="none" stroke="#ffcf4b" stroke-width="9" stroke-linecap="round" opacity=".9" />
+          <path d="M28 75 C45 63 61 61 82 68" fill="none" stroke="#45b8ff" stroke-width="9" stroke-linecap="round" opacity=".9" />
+        </svg>
+      </div>
+      <div class="bottom-text">36개의 배구공을 4개씩 묶으면?</div>
+      <div class="bottom-icon">
+        <svg viewBox="0 0 120 120" role="img" aria-label="배구공 그림">
+          <circle cx="60" cy="60" r="48" fill="#fff8e7" stroke="#17243f" stroke-width="6" />
+          <path d="M22 56 C39 42 61 40 82 52 C72 63 67 76 68 98" fill="none" stroke="#17243f" stroke-width="5" stroke-linecap="round" />
+          <path d="M44 15 C45 34 53 47 68 58 C83 69 92 82 95 103" fill="none" stroke="#17243f" stroke-width="5" stroke-linecap="round" />
+          <path d="M35 93 C48 78 65 71 89 72" fill="none" stroke="#17243f" stroke-width="5" stroke-linecap="round" />
+          <path d="M28 35 C42 23 60 16 80 20" fill="none" stroke="#ffcf4b" stroke-width="9" stroke-linecap="round" opacity=".9" />
+          <path d="M28 75 C45 63 61 61 82 68" fill="none" stroke="#45b8ff" stroke-width="9" stroke-linecap="round" opacity=".9" />
+        </svg>
+      </div>
+    </div>
+  </footer>
+</main>
+
+
+<script>
+(() => {
+  'use strict';
+
+  const TOTAL_BALLS = 36;
+  const GROUP_SIZE = 4;
+  const TARGET_GROUPS = TOTAL_BALLS / GROUP_SIZE;
+  const COLORS = [
+    '#ef476f', '#06d6a0', '#118ab2', '#ff9f1c', '#7b2cbf',
+    '#2ec4b6', '#f15bb5', '#4d96ff', '#8ac926', '#ff6b6b'
+  ];
+
+  const activity = document.getElementById('activity');
+  const board = document.getElementById('courtBoard');
+  const itemsLayer = document.getElementById('itemsLayer');
+  const labelsLayer = document.getElementById('labelsLayer');
+  const groupsSvg = document.getElementById('groupsSvg');
+  const canvas = document.getElementById('drawCanvas');
+  const ctx = canvas.getContext('2d');
+  const feedback = document.getElementById('feedback');
+  const groupBadge = document.getElementById('groupBadge');
+  const undoBtn = document.getElementById('undoBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+  const balls = [];
+  const groups = [];
+  let drawing = false;
+  let points = [];
+  let activePointerId = null;
+
+  function volleyballSvg(index) {
+    const hue = index % 3;
+    const panelA = hue === 0 ? '#ffcf4b' : hue === 1 ? '#45b8ff' : '#ff7d56';
+    const panelB = hue === 0 ? '#45b8ff' : hue === 1 ? '#ff7d56' : '#ffcf4b';
+    const panelC = hue === 0 ? '#ff7d56' : hue === 1 ? '#ffcf4b' : '#45b8ff';
+    return `
+      <svg viewBox="0 0 100 100" role="img" aria-label="배구공">
+        <clipPath id="clipBall${index}"><circle cx="50" cy="50" r="45" /></clipPath>
+        <g clip-path="url(#clipBall${index})">
+          <circle class="ball-main" cx="50" cy="50" r="45" />
+          <path class="ball-panel-a" d="M8 45 C24 28 48 24 69 36 C60 46 55 57 55 70 C35 60 20 59 6 68 Z" fill="${panelA}" />
+          <path class="ball-panel-b" d="M39 4 C41 24 50 39 66 50 C82 61 91 76 94 99 L58 99 C55 79 60 61 75 44 C58 33 47 19 45 2 Z" fill="${panelB}" />
+          <path class="ball-panel-c" d="M15 83 C31 68 50 62 76 64 C84 72 90 83 93 96 C61 103 32 98 15 83 Z" fill="${panelC}" />
+          <path class="ball-seam" d="M8 45 C24 28 48 24 69 36 C60 46 55 57 55 70" />
+          <path class="ball-seam" d="M39 4 C41 24 50 39 66 50 C82 61 91 76 94 99" />
+          <path class="ball-seam" d="M15 83 C31 68 50 62 76 64" />
+          <path class="ball-seam" d="M30 15 C31 36 39 51 55 61 C70 70 79 83 81 99" opacity=".55" />
+          <ellipse class="ball-highlight" cx="33" cy="28" rx="14" ry="9" transform="rotate(-28 33 28)" />
+        </g>
+        <circle class="ball-outline" cx="50" cy="50" r="45" />
+      </svg>
+    `;
+  }
+
+  function createBalls() {
+    itemsLayer.innerHTML = '';
+    balls.length = 0;
+
+    // 36개를 9개의 세로줄로 배치했습니다. 한 세로줄을 둘러싸면 4개씩 1묶음이 됩니다.
+    const xs = [9.8, 19.9, 30.0, 40.1, 50.2, 60.3, 70.4, 80.5, 90.6];
+    const ys = [19.6, 39.2, 58.8, 78.4];
+    let index = 0;
+    for (let col = 0; col < 9; col += 1) {
+      for (let row = 0; row < 4; row += 1) {
+        index += 1;
+        const x = xs[col];
+        const y = ys[row];
+        const rot = ((row * 19 + col * 17) % 50) - 25;
+        const item = document.createElement('div');
+        item.className = 'ball-item';
+        item.style.setProperty('--x', x.toFixed(2));
+        item.style.setProperty('--y', y.toFixed(2));
+        item.style.setProperty('--rot', `${rot}deg`);
+        item.dataset.index = String(index - 1);
+        item.innerHTML = volleyballSvg(index);
+        itemsLayer.appendChild(item);
+        balls.push({ id: index - 1, x, y, el: item, group: null });
+      }
+    }
+  }
+
+  function resizeCanvas() {
+    const rect = board.getBoundingClientRect();
+    const ratio = window.devicePixelRatio || 1;
+    canvas.width = Math.max(1, Math.round(rect.width * ratio));
+    canvas.height = Math.max(1, Math.round(rect.height * ratio));
+    canvas.style.width = `${rect.width}px`;
+    canvas.style.height = `${rect.height}px`;
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    clearDrawCanvas();
+  }
+
+  function clearDrawCanvas() {
+    const rect = board.getBoundingClientRect();
+    ctx.clearRect(0, 0, rect.width, rect.height);
+  }
+
+  function setFeedback(type, icon, html) {
+    feedback.className = `feedback${type ? ` ${type}` : ''}${icon ? '' : ' message-only'}`;
+    feedback.innerHTML = icon
+      ? `<span aria-hidden="true">${icon}</span><span>${html}</span>`
+      : `<span>${html}</span>`;
+  }
+
+  function updateStatus() {
+    const made = groups.length;
+    groupBadge.textContent = `${made}묶음`;
+
+    if (made === TARGET_GROUPS) {
+      board.classList.add('complete');
+      return;
+    }
+
+    board.classList.remove('complete');
+  }
+
+  function boardPoint(event) {
+    const rect = board.getBoundingClientRect();
+    return {
+      x: Math.max(0, Math.min(rect.width, event.clientX - rect.left)),
+      y: Math.max(0, Math.min(rect.height, event.clientY - rect.top))
+    };
+  }
+
+  function drawCurrentPath() {
+    clearDrawCanvas();
+    if (points.length < 2) return;
+
+    ctx.lineWidth = 6;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = '#17243f';
+    ctx.globalAlpha = .92;
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 1; i < points.length; i += 1) {
+      ctx.lineTo(points[i].x, points[i].y);
+    }
+    ctx.stroke();
+
+    ctx.lineWidth = 2.2;
+    ctx.strokeStyle = '#ffffff';
+    ctx.globalAlpha = .86;
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 1; i < points.length; i += 1) {
+      ctx.lineTo(points[i].x, points[i].y);
+    }
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+
+  function pointInPolygon(point, polygon) {
+    let inside = false;
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+      const xi = polygon[i].x, yi = polygon[i].y;
+      const xj = polygon[j].x, yj = polygon[j].y;
+      const intersects = ((yi > point.y) !== (yj > point.y)) &&
+        (point.x < (xj - xi) * (point.y - yi) / ((yj - yi) || 0.000001) + xi);
+      if (intersects) inside = !inside;
+    }
+    return inside;
+  }
+
+  function ballCenterPixels(ball) {
+    const rect = board.getBoundingClientRect();
+    return { x: rect.width * ball.x / 100, y: rect.height * ball.y / 100 };
+  }
+
+  function pathLength(polyline) {
+    let total = 0;
+    for (let i = 1; i < polyline.length; i += 1) {
+      total += Math.hypot(polyline[i].x - polyline[i - 1].x, polyline[i].y - polyline[i - 1].y);
+    }
+    return total;
+  }
+
+  function simplifyPath(polyline) {
+    if (polyline.length <= 90) return polyline.slice();
+    const step = Math.ceil(polyline.length / 90);
+    const simplified = [];
+    for (let i = 0; i < polyline.length; i += step) simplified.push(polyline[i]);
+    simplified.push(polyline[polyline.length - 1]);
+    return simplified;
+  }
+
+  function makeSvgPath(polyline) {
+    const rect = board.getBoundingClientRect();
+    const simplified = simplifyPath(polyline);
+    return simplified.map((p, index) => {
+      const x = (p.x / rect.width) * 1000;
+      const y = (p.y / rect.height) * 1000;
+      return `${index === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(' ') + ' Z';
+  }
+
+  function centroidFromBalls(selectedBalls) {
+    const x = selectedBalls.reduce((sum, ball) => sum + ball.x, 0) / selectedBalls.length;
+    const y = selectedBalls.reduce((sum, ball) => sum + ball.y, 0) / selectedBalls.length;
+    return { x, y };
+  }
+
+  function addGroup(selectedBalls, polyline) {
+    const groupIndex = groups.length;
+    const color = COLORS[groupIndex % COLORS.length];
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', makeSvgPath(polyline));
+    path.setAttribute('fill', color);
+    path.setAttribute('fill-opacity', '0.10');
+    path.setAttribute('stroke', color);
+    path.setAttribute('stroke-width', '10');
+    path.setAttribute('stroke-linecap', 'round');
+    path.setAttribute('stroke-linejoin', 'round');
+    path.setAttribute('stroke-opacity', '0.95');
+
+    const label = document.createElement('div');
+    const center = centroidFromBalls(selectedBalls);
+    label.className = 'group-label';
+    label.style.setProperty('--x', center.x.toFixed(2));
+    label.style.setProperty('--y', center.y.toFixed(2));
+    label.style.setProperty('--color', color);
+    label.textContent = `${groupIndex + 1}묶음`;
+
+    groupsSvg.appendChild(path);
+    labelsLayer.appendChild(label);
+
+    selectedBalls.forEach((ball) => {
+      ball.group = groupIndex;
+      ball.el.classList.add('grouped');
+    });
+
+    groups.push({ balls: selectedBalls.map(ball => ball.id), path, label });
+    updateStatus();
+
+    if (groups.length === TARGET_GROUPS) {
+      setFeedback('good', '', '잘했어요. 이제 몇묶음인지 확인하세요');
+    } else {
+      setFeedback('good', '✅', `좋아요! ${groups.length}묶음이 완성되었어요. 계속 4개씩 묶어 보세요.`);
+    }
+  }
+
+  function finishDrawing() {
+    if (!drawing) return;
+    drawing = false;
+    activePointerId = null;
+    clearDrawCanvas();
+
+    if (points.length < 8 || pathLength(points) < 60) {
+      points = [];
+      setFeedback('warn', '✏️', '선을 조금 더 길게 그려서 공 4개를 한 바퀴 둘러싸 보세요.');
+      return;
+    }
+
+    const selectedAll = [];
+    const selectedUngrouped = [];
+    const selectedGrouped = [];
+
+    balls.forEach((ball) => {
+      const center = ballCenterPixels(ball);
+      if (pointInPolygon(center, points)) {
+        selectedAll.push(ball);
+        if (ball.group === null) selectedUngrouped.push(ball);
+        else selectedGrouped.push(ball);
+      }
+    });
+
+    if (selectedAll.length === 0) {
+      points = [];
+      setFeedback('warn', '🔍', '둘러싼 곳 안에 배구공이 없어요. 공 4개가 들어가도록 다시 그려 보세요.');
+      return;
+    }
+
+    if (selectedGrouped.length > 0) {
+      points = [];
+      setFeedback('warn', '↪️', '이미 묶은 공이 선 안에 들어갔어요. 아직 묶지 않은 공 4개만 둘러싸 보세요.');
+      return;
+    }
+
+    if (selectedUngrouped.length !== GROUP_SIZE) {
+      const n = selectedUngrouped.length;
+      points = [];
+      setFeedback('warn', '💡', `지금 둘러싼 공은 <strong>${n}개</strong>예요. 36÷4는 <strong>4개씩</strong> 묶는 활동이므로, 공 4개만 다시 둘러싸 보세요.`);
+      return;
+    }
+
+    addGroup(selectedUngrouped, points.slice());
+    points = [];
+  }
+
+  function undoLastGroup() {
+    if (!groups.length) {
+      setFeedback('warn', '↩', '아직 취소할 묶음이 없어요. 먼저 공 4개를 묶어 보세요.');
+      return;
+    }
+
+    const last = groups.pop();
+    last.path.remove();
+    last.label.remove();
+    last.balls.forEach((id) => {
+      const ball = balls[id];
+      ball.group = null;
+      ball.el.classList.remove('grouped');
+    });
+    updateStatus();
+    setFeedback('', '↩', '마지막 묶음을 취소했어요. 다시 4개씩 묶어 보세요.');
+  }
+
+  function resetActivity({ quiet = false } = {}) {
+    groups.splice(0, groups.length);
+    groupsSvg.innerHTML = '';
+    labelsLayer.innerHTML = '';
+    balls.forEach((ball) => {
+      ball.group = null;
+      ball.el.classList.remove('grouped');
+    });
+    points = [];
+    drawing = false;
+    activePointerId = null;
+    clearDrawCanvas();
+    updateStatus();
+    if (!quiet) {
+      setFeedback('', '👆', '배구공 36개를 <strong>4개씩</strong> 둘러 선을 그어 보세요. 한 묶음에는 꼭 4개가 들어가야 해요.');
+    }
+  }
+
+  function toggleFullscreen() {
+    const fullscreenElement = document.fullscreenElement || document.webkitFullscreenElement;
+    if (fullscreenElement) {
+      if (document.exitFullscreen) document.exitFullscreen();
+      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      return;
+    }
+    if (activity.requestFullscreen) activity.requestFullscreen();
+    else if (activity.webkitRequestFullscreen) activity.webkitRequestFullscreen();
+  }
+
+  board.addEventListener('pointerdown', (event) => {
+    if (groups.length === TARGET_GROUPS) return;
+    event.preventDefault();
+    board.setPointerCapture?.(event.pointerId);
+    activePointerId = event.pointerId;
+    drawing = true;
+    points = [boardPoint(event)];
+    drawCurrentPath();
+  });
+
+  board.addEventListener('pointermove', (event) => {
+    if (!drawing || event.pointerId !== activePointerId) return;
+    event.preventDefault();
+    const p = boardPoint(event);
+    const last = points[points.length - 1];
+    if (!last || Math.hypot(p.x - last.x, p.y - last.y) >= 2) {
+      points.push(p);
+      drawCurrentPath();
+    }
+  });
+
+  board.addEventListener('pointerup', (event) => {
+    if (event.pointerId !== activePointerId) return;
+    event.preventDefault();
+    finishDrawing();
+  });
+
+  board.addEventListener('pointercancel', () => finishDrawing());
+  board.addEventListener('lostpointercapture', () => {
+    if (drawing) finishDrawing();
+  });
+
+  undoBtn.addEventListener('click', undoLastGroup);
+  resetBtn.addEventListener('click', () => resetActivity());
+  fullscreenBtn.addEventListener('click', toggleFullscreen);
+  window.addEventListener('keydown', (event) => {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
+      event.preventDefault();
+      undoLastGroup();
+    }
+  });
+
+  window.addEventListener('resize', resizeCanvas);
+  document.addEventListener('fullscreenchange', () => window.setTimeout(resizeCanvas, 120));
+  document.addEventListener('webkitfullscreenchange', () => window.setTimeout(resizeCanvas, 120));
+
+  createBalls();
+  resizeCanvas();
+  updateStatus();
+})();
+</script>
+</body>
+</html>
