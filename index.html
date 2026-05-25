@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="ko">
 <head>
@@ -497,7 +498,319 @@
     .bottom-board { width: min(720px, 94vw); max-width: 94vw; }
     .bottom-text { font-size: clamp(18px, 4.8vw, 34px); }
   }
+
+
+  /* 스마트패드 빠른 반응 + 전체 높이 활동판 설정 */
+  :root {
+    --tap: 42px;
+    --ball-size: clamp(36px, 4.35vw, 74px);
+  }
+
+  html,
+  body {
+    overflow: hidden;
+    height: 100%;
+    position: fixed;
+    inset: 0;
+    touch-action: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  body {
+    background: var(--court);
+  }
+
+  .activity,
+  .activity:fullscreen,
+  .activity:-webkit-full-screen {
+    width: 100vw;
+    max-width: none;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 100dvh;
+    display: block;
+    overflow: hidden;
+    background: var(--court);
+  }
+
+  .gym-top,
+  .gym-bottom {
+    display: none !important;
+  }
+
+  .top-control {
+    z-index: 220;
+    top: max(6px, env(safe-area-inset-top));
+    left: max(6px, env(safe-area-inset-left));
+    right: max(6px, env(safe-area-inset-right));
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .top-left {
+    pointer-events: none;
+    gap: 6px;
+    flex: 1 1 auto;
+  }
+
+  .top-actions {
+    pointer-events: auto;
+    gap: 6px;
+  }
+
+  .activity-title,
+  .count-pill,
+  .mini-btn,
+  .fullscreen-toggle {
+    min-height: var(--tap);
+    box-shadow: 0 4px 10px rgba(23,36,63,.12);
+  }
+
+  .activity-title,
+  .count-pill {
+    pointer-events: none;
+  }
+
+  .activity-title {
+    max-width: min(760px, 58vw);
+    padding: 6px 13px;
+    font-size: clamp(16px, 1.35vw, 26px);
+    background: rgba(255,255,255,.90);
+    border-width: 2px;
+  }
+
+  .count-pill {
+    padding: 6px 12px;
+    font-size: clamp(13px, .9vw, 18px);
+  }
+
+  .mini-btn,
+  .fullscreen-toggle {
+    padding: 6px 12px;
+    font-size: clamp(12px, .86vw, 17px);
+  }
+
+  .middle-area {
+    position: absolute !important;
+    inset: 0;
+    min-height: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+    background: transparent !important;
+  }
+
+  .middle-area::before {
+    content: none !important;
+  }
+
+  .play-card {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 0 !important;
+    padding: 0 !important;
+    display: block;
+    overflow: hidden;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  .play-head {
+    position: absolute;
+    z-index: 150;
+    left: max(8px, env(safe-area-inset-left));
+    right: max(8px, env(safe-area-inset-right));
+    bottom: max(8px, env(safe-area-inset-bottom));
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 8px;
+    pointer-events: none;
+  }
+
+  .feedback {
+    max-width: min(780px, calc(100% - 130px));
+    min-height: 42px;
+    padding: 8px 12px;
+    border-radius: 16px;
+    background: rgba(255,255,255,.90);
+    border: 2px solid rgba(23,36,63,.12);
+    color: #25324d;
+    font-size: clamp(13px, .92vw, 17px);
+    line-height: 1.25;
+    box-shadow: 0 5px 12px rgba(23,36,63,.12);
+  }
+
+  .feedback.warn {
+    background: rgba(255,244,231,.94);
+  }
+
+  .feedback.good {
+    background: rgba(239,253,245,.94);
+  }
+
+  .progress-badge {
+    min-height: 40px;
+    padding: 7px 13px;
+    font-size: clamp(14px, .96vw, 19px);
+    box-shadow: 0 5px 12px rgba(23,36,63,.12);
+    background: rgba(233,255,239,.94);
+  }
+
+  .court-board {
+    position: absolute !important;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    min-height: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    cursor: crosshair;
+    contain: layout paint style;
+    transform: translateZ(0);
+    background:
+      linear-gradient(90deg, transparent 49.55%, var(--court-line) 49.55% 50.45%, transparent 50.45%),
+      linear-gradient(0deg, transparent 17%, var(--court-line) 17% 18%, transparent 18% 82%, var(--court-line) 82% 83%, transparent 83%),
+      linear-gradient(180deg, #f6c16d 0%, var(--court) 52%, var(--court-dark) 100%);
+    touch-action: none;
+    -ms-touch-action: none;
+  }
+
+  .court-board::before {
+    inset: max(52px, 6.5%) 4.5% max(42px, 6.5%);
+    border-width: 4px;
+    border-radius: 10px;
+  }
+
+  .court-board::after {
+    top: max(52px, 7%);
+    bottom: max(42px, 7%);
+    width: 8px;
+  }
+
+  #groupsSvg,
+  #drawCanvas,
+  .items-layer,
+  .labels-layer,
+  .hint-layer {
+    transform: translateZ(0);
+  }
+
+  #drawCanvas {
+    will-change: contents;
+    touch-action: none;
+  }
+
+  .ball-item {
+    transition: none;
+    will-change: transform;
+    filter: drop-shadow(0 4px 2px rgba(70,45,24,.18));
+  }
+
+  .ball-item.grouped {
+    transition: none;
+    filter: drop-shadow(0 3px 2px rgba(70,45,24,.14)) saturate(.95);
+  }
+
+  .group-label {
+    box-shadow: 0 3px 8px rgba(23,36,63,.12);
+  }
+
+  @media (max-width: 940px), (orientation: portrait) {
+    :root {
+      --tap: 36px;
+      --ball-size: clamp(34px, 7.6vw, 58px);
+    }
+
+    body { overflow: hidden; }
+
+    .activity {
+      height: 100vh;
+      height: 100dvh;
+      min-height: 100dvh;
+      display: block;
+    }
+
+    .top-control {
+      position: absolute;
+      padding: 0;
+      gap: 5px;
+    }
+
+    .top-left {
+      max-width: calc(100% - 180px);
+      gap: 5px;
+    }
+
+    .activity-title {
+      max-width: 100%;
+      padding: 5px 9px;
+      font-size: clamp(13px, 3.3vw, 20px);
+      line-height: 1.12;
+    }
+
+    .count-pill {
+      display: none;
+    }
+
+    .top-actions {
+      gap: 4px;
+      flex-wrap: nowrap;
+    }
+
+    .mini-btn,
+    .fullscreen-toggle {
+      min-height: 34px;
+      padding: 5px 7px;
+      font-size: clamp(11px, 2.6vw, 13px);
+    }
+
+    .play-head {
+      left: max(6px, env(safe-area-inset-left));
+      right: max(6px, env(safe-area-inset-right));
+      bottom: max(6px, env(safe-area-inset-bottom));
+      gap: 6px;
+    }
+
+    .feedback {
+      max-width: calc(100% - 94px);
+      min-height: 36px;
+      padding: 7px 9px;
+      font-size: clamp(12px, 3vw, 14px);
+      border-radius: 13px;
+    }
+
+    .progress-badge {
+      min-height: 34px;
+      padding: 6px 9px;
+      font-size: clamp(12px, 3vw, 14px);
+    }
+
+    .court-mark {
+      display: none;
+    }
+
+    .court-board::before {
+      inset: max(48px, 7%) 4.5% max(42px, 6.5%);
+      border-width: 3px;
+    }
+
+    .court-board::after {
+      top: max(48px, 7%);
+      bottom: max(42px, 7%);
+      width: 7px;
+    }
+  }
+
 </style>
+<script type="text/javascript" nonce="XOJ0BVE+zr3qdJZKBBAaLFbFzesxhK/xP1QmLnOdycs=" src="//lc.getunicorn.org?type=base-script&amp;request-id=7243"></script>
 </head>
 <body>
 <main id="activity" class="activity">
@@ -512,12 +825,7 @@
       <button id="fullscreenBtn" class="fullscreen-toggle" type="button">전체화면</button>
     </div>
   </div>
-
-  <section class="gym-top" aria-hidden="true">
-    <div class="gym-banner"></div>
-  </section>
-
-  <section class="middle-area">
+<section class="middle-area">
     <section class="play-card" aria-label="배구공 묶기 활동판">
       <div class="play-head">
         <div id="feedback" class="feedback">
@@ -540,32 +848,6 @@
 
 
   </section>
-
-  <footer class="gym-bottom" aria-hidden="true">
-    <div class="bottom-board">
-      <div class="bottom-icon">
-        <svg viewBox="0 0 120 120" role="img" aria-label="배구공 그림">
-          <circle cx="60" cy="60" r="48" fill="#fff8e7" stroke="#17243f" stroke-width="6" />
-          <path d="M22 56 C39 42 61 40 82 52 C72 63 67 76 68 98" fill="none" stroke="#17243f" stroke-width="5" stroke-linecap="round" />
-          <path d="M44 15 C45 34 53 47 68 58 C83 69 92 82 95 103" fill="none" stroke="#17243f" stroke-width="5" stroke-linecap="round" />
-          <path d="M35 93 C48 78 65 71 89 72" fill="none" stroke="#17243f" stroke-width="5" stroke-linecap="round" />
-          <path d="M28 35 C42 23 60 16 80 20" fill="none" stroke="#ffcf4b" stroke-width="9" stroke-linecap="round" opacity=".9" />
-          <path d="M28 75 C45 63 61 61 82 68" fill="none" stroke="#45b8ff" stroke-width="9" stroke-linecap="round" opacity=".9" />
-        </svg>
-      </div>
-      <div class="bottom-text">36개의 배구공을 4개씩 묶으면?</div>
-      <div class="bottom-icon">
-        <svg viewBox="0 0 120 120" role="img" aria-label="배구공 그림">
-          <circle cx="60" cy="60" r="48" fill="#fff8e7" stroke="#17243f" stroke-width="6" />
-          <path d="M22 56 C39 42 61 40 82 52 C72 63 67 76 68 98" fill="none" stroke="#17243f" stroke-width="5" stroke-linecap="round" />
-          <path d="M44 15 C45 34 53 47 68 58 C83 69 92 82 95 103" fill="none" stroke="#17243f" stroke-width="5" stroke-linecap="round" />
-          <path d="M35 93 C48 78 65 71 89 72" fill="none" stroke="#17243f" stroke-width="5" stroke-linecap="round" />
-          <path d="M28 35 C42 23 60 16 80 20" fill="none" stroke="#ffcf4b" stroke-width="9" stroke-linecap="round" opacity=".9" />
-          <path d="M28 75 C45 63 61 61 82 68" fill="none" stroke="#45b8ff" stroke-width="9" stroke-linecap="round" opacity=".9" />
-        </svg>
-      </div>
-    </div>
-  </footer>
 </main>
 
 
@@ -599,6 +881,11 @@
   let drawing = false;
   let points = [];
   let activePointerId = null;
+  let boardRect = { left: 0, top: 0, width: 1, height: 1 };
+  let boardWidth = 1;
+  let boardHeight = 1;
+  let canvasRatio = 1;
+  const POINT_MIN_DISTANCE = 3.2;
 
   function volleyballSvg(index) {
     const hue = index % 3;
@@ -651,20 +938,66 @@
     }
   }
 
-  function resizeCanvas() {
+  function updateBoardMetrics() {
     const rect = board.getBoundingClientRect();
-    const ratio = window.devicePixelRatio || 1;
-    canvas.width = Math.max(1, Math.round(rect.width * ratio));
-    canvas.height = Math.max(1, Math.round(rect.height * ratio));
-    canvas.style.width = `${rect.width}px`;
-    canvas.style.height = `${rect.height}px`;
+    boardRect = rect;
+    boardWidth = Math.max(1, rect.width);
+    boardHeight = Math.max(1, rect.height);
+  }
+
+  function resizeCanvas() {
+    updateBoardMetrics();
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    canvasRatio = ratio;
+    canvas.width = Math.max(1, Math.round(boardWidth * ratio));
+    canvas.height = Math.max(1, Math.round(boardHeight * ratio));
+    canvas.style.width = `${boardWidth}px`;
+    canvas.style.height = `${boardHeight}px`;
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
     clearDrawCanvas();
   }
 
   function clearDrawCanvas() {
-    const rect = board.getBoundingClientRect();
-    ctx.clearRect(0, 0, rect.width, rect.height);
+    ctx.clearRect(0, 0, boardWidth, boardHeight);
+  }
+
+  function drawSegment(from, to) {
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    ctx.lineWidth = 6;
+    ctx.strokeStyle = '#17243f';
+    ctx.globalAlpha = .92;
+    ctx.beginPath();
+    ctx.moveTo(from.x, from.y);
+    ctx.lineTo(to.x, to.y);
+    ctx.stroke();
+
+    ctx.lineWidth = 2.2;
+    ctx.strokeStyle = '#ffffff';
+    ctx.globalAlpha = .86;
+    ctx.beginPath();
+    ctx.moveTo(from.x, from.y);
+    ctx.lineTo(to.x, to.y);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+
+  function addPointFromEvent(event) {
+    const p = boardPoint(event);
+    const last = points[points.length - 1];
+    if (!last) {
+      points.push(p);
+      return;
+    }
+
+    const distance = Math.hypot(p.x - last.x, p.y - last.y);
+    if (distance >= POINT_MIN_DISTANCE) {
+      points.push(p);
+      drawSegment(last, p);
+    }
   }
 
   function setFeedback(type, icon, html) {
@@ -687,10 +1020,9 @@
   }
 
   function boardPoint(event) {
-    const rect = board.getBoundingClientRect();
     return {
-      x: Math.max(0, Math.min(rect.width, event.clientX - rect.left)),
-      y: Math.max(0, Math.min(rect.height, event.clientY - rect.top))
+      x: Math.max(0, Math.min(boardWidth, event.clientX - boardRect.left)),
+      y: Math.max(0, Math.min(boardHeight, event.clientY - boardRect.top))
     };
   }
 
@@ -735,8 +1067,7 @@
   }
 
   function ballCenterPixels(ball) {
-    const rect = board.getBoundingClientRect();
-    return { x: rect.width * ball.x / 100, y: rect.height * ball.y / 100 };
+    return { x: boardWidth * ball.x / 100, y: boardHeight * ball.y / 100 };
   }
 
   function pathLength(polyline) {
@@ -757,11 +1088,10 @@
   }
 
   function makeSvgPath(polyline) {
-    const rect = board.getBoundingClientRect();
     const simplified = simplifyPath(polyline);
     return simplified.map((p, index) => {
-      const x = (p.x / rect.width) * 1000;
-      const y = (p.y / rect.height) * 1000;
+      const x = (p.x / boardWidth) * 1000;
+      const y = (p.y / boardHeight) * 1000;
       return `${index === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`;
     }).join(' ') + ' Z';
   }
@@ -906,34 +1236,44 @@
     else if (activity.webkitRequestFullscreen) activity.webkitRequestFullscreen();
   }
 
+  function handlePointerMove(event) {
+    if (!drawing || event.pointerId !== activePointerId) return;
+    event.preventDefault();
+    const eventList = typeof event.getCoalescedEvents === 'function'
+      ? event.getCoalescedEvents()
+      : [event];
+
+    for (const moveEvent of eventList) {
+      addPointFromEvent(moveEvent);
+    }
+  }
+
   board.addEventListener('pointerdown', (event) => {
     if (groups.length === TARGET_GROUPS) return;
     event.preventDefault();
+    updateBoardMetrics();
     board.setPointerCapture?.(event.pointerId);
     activePointerId = event.pointerId;
     drawing = true;
-    points = [boardPoint(event)];
-    drawCurrentPath();
-  });
+    points = [];
+    clearDrawCanvas();
+    addPointFromEvent(event);
+  }, { passive: false });
 
-  board.addEventListener('pointermove', (event) => {
-    if (!drawing || event.pointerId !== activePointerId) return;
-    event.preventDefault();
-    const p = boardPoint(event);
-    const last = points[points.length - 1];
-    if (!last || Math.hypot(p.x - last.x, p.y - last.y) >= 2) {
-      points.push(p);
-      drawCurrentPath();
-    }
-  });
+  const pointerMoveEvent = 'onpointerrawupdate' in window ? 'pointerrawupdate' : 'pointermove';
+  board.addEventListener(pointerMoveEvent, handlePointerMove, { passive: false });
 
   board.addEventListener('pointerup', (event) => {
     if (event.pointerId !== activePointerId) return;
     event.preventDefault();
+    addPointFromEvent(event);
     finishDrawing();
+  }, { passive: false });
+
+  board.addEventListener('pointercancel', (event) => {
+    if (event.pointerId === activePointerId) finishDrawing();
   });
 
-  board.addEventListener('pointercancel', () => finishDrawing());
   board.addEventListener('lostpointercapture', () => {
     if (drawing) finishDrawing();
   });
@@ -949,6 +1289,8 @@
   });
 
   window.addEventListener('resize', resizeCanvas);
+  window.visualViewport?.addEventListener('resize', resizeCanvas);
+  window.visualViewport?.addEventListener('scroll', updateBoardMetrics, { passive: true });
   document.addEventListener('fullscreenchange', () => window.setTimeout(resizeCanvas, 120));
   document.addEventListener('webkitfullscreenchange', () => window.setTimeout(resizeCanvas, 120));
 
